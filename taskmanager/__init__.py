@@ -8,7 +8,14 @@ if os.path.exists("env.py"): # if you can find a file path to an existing file c
 app = Flask(__name__) # __name__ is the defualt Flask module
 # set up app configuration variables that will come from our enviroment variables
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY")
-app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DB_URL")
+
+if os.environ.get("DEVELOPMENT") == "True":
+    app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DB_URL")
+else:
+    uri = os.environ.get("DATABASE_URL")
+    if uri.startswith("postgres://"):
+        uri = uri.replace("postgres://", "postgresql://", 1)
+    app.config["SQLALCHEMY_DATABASE_URI"] = uri
 
 db = SQLAlchemy(app) # create instance of imported SQLAlchemy() class to variable 'db' and set to the imstance of our Flask 'app'
 
